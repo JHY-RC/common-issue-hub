@@ -1,0 +1,5 @@
+.list-item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.item-actions{display:flex;gap:7px;flex-shrink:0}
+.text-button{border:0;background:transparent;color:#176e62;padding:2px;font:12px inherit;cursor:pointer}
+.text-button:hover{text-decoration:underline}
+.text-button.danger{color:#a64032}

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>共性问题平台</title>
+  <link rel="stylesheet" href="/v2.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">◇</span>
+      <div><strong>共性问题平台</strong><small>版本风险，一目了然</small></div>
+    </div>
+    <nav>
+      <button class="nav active" data-view="assessment"><span>01</span>迭代评估</button>
+      <button class="nav" data-view="versions"><span>02</span>版本与分支</button>
+      <button class="nav" data-view="issues"><span>03</span>问题与需求</button>
+    </nav>
+    <div class="local-note">本地数据模式<small>机台型号暂不参与判断</small></div>
+  </aside>
+
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">VERSION INTELLIGENCE</p>
+        <h1 id="page-title">迭代评估</h1>
+        <p id="page-subtitle">选择准备迭代的版本，立即查看尚未解决的共性事项。</p>
+      </div>
+      <a class="button secondary" href="/api/v2/export.csv">导出备份</a>
+    </header>
+
+    <section id="assessment" class="view active">
+      <div class="decision-panel">
+        <div>
+          <p class="eyebrow light">START FROM A VERSION</p>
+          <h2>我要基于哪个版本<br>开始下一次迭代？</h2>
+          <p>目标版本达到问题发生版本后才进入待办；系统再沿版本关系追溯，只把真正进入当前版本的修复算作已完成。</p>
+        </div>
+        <div class="decision-form">
+          <label>软件产品<select id="assessment-product"></select></label>
+          <label>目标版本<select id="assessment-version"></select></label>
+          <button class="button bright" id="run-assessment">查看待办事项</button>
+        </div>
+      </div>
+      <div id="assessment-result" class="empty-state">
+        <span>选择一个目标版本</span>
+        <p>这里将展示未修复问题、未实现需求，以及其他分支已经存在的修复版本。</p>
+      </div>
+    </section>
+
+    <section id="versions" class="view">
+      <div class="two-column">
+        <article class="panel compact-panel">
+          <div class="panel-title"><div><p class="eyebrow">PRODUCT</p><h2>软件产品</h2></div></div>
+          <form id="product-form" class="stack-form">
+            <input name="name" required placeholder="例如：Phoenix 软件">
+            <button class="button">新增产品</button>
+          </form>
+          <div id="product-list" class="record-list"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-title">
+            <div><p class="eyebrow">VERSION GRAPH</p><h2>新增版本节点</h2></div>
+            <span class="hint">父版本决定修复是否继承</span>
+          </div>
+          <form id="version-form" class="grid-form">
+            <label>软件产品<select name="productId" required></select></label>
+            <label>版本号<input name="name" required placeholder="例如：V1.3"></label>
+            <label>所在分支<input name="branchName" required list="branch-options" placeholder="主线 / V1.1维护分支"></label>
+            <label>父版本<select name="parentId"><option value="">无父版本（起点）</option></select></label>
+            <label class="wide">说明<input name="note" placeholder="可选：发布时间、用途等"></label>
+            <button class="button wide">新增版本</button>
+          </form>
+          <datalist id="branch-options"></datalist>
+        </article>
+      </div>
+      <div id="branch-board" class="branch-board"></div>
+    </section>
+
+    <section id="issues" class="view">
+      <article class="panel">
+        <div class="panel-title">
+          <div><p class="eyebrow">ISSUE OR REQUIREMENT</p><h2>录入共性事项</h2></div>
+          <span class="hint">发生 / 提出版本决定事项从哪个版本开始进入待办</span>
+        </div>
+        <form id="issue-form" class="grid-form issue-entry">
+          <label>软件产品<select name="productId" required></select></label>
+          <label>类别<select name="category"><option>共性问题</option><option>共性需求</option></select></label>
+          <label>发生 / 提出版本<select name="occurrenceVersionId" required></select></label>
+          <label class="wide">描述<textarea name="description" required placeholder="描述现象、影响或需要实现的内容"></textarea></label>
+          <button class="button wide">录入事项</button>
+        </form>
+      </article>
+      <div class="list-toolbar">
+        <div><strong>全部事项</strong><span id="issue-count"></span></div>
+        <select id="issue-filter"><option value="all">全部类别</option><option value="共性问题">共性问题</option><option value="共性需求">共性需求</option></select>
+      </div>
+      <div id="issue-list" class="issue-list"></div>
+    </section>
+  </main>
+
+  <dialog id="version-dialog">
+    <form id="version-edit-form">
+      <div class="dialog-head"><div><p class="eyebrow">EDIT VERSION</p><h2>编辑版本</h2></div><button type="button" class="icon close-dialog">×</button></div>
+      <input type="hidden" name="id">
+      <label>版本号<input name="name" required></label>
+      <label>所在分支<input name="branchName" required list="branch-options"></label>
+      <label>父版本<select name="parentId"></select></label>
+      <label>说明<input name="note"></label>
+      <div class="dialog-actions"><button type="button" class="button secondary close-dialog">取消</button><button class="button">保存修改</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="issue-dialog">
+    <form id="issue-edit-form">
+      <div class="dialog-head"><div><p class="eyebrow">EDIT ITEM</p><h2>编辑共性事项</h2></div><button type="button" class="icon close-dialog">×</button></div>
+      <input type="hidden" name="id">
+      <label>类别<select name="category"><option>共性问题</option><option>共性需求</option></select></label>
+      <label>发生 / 提出版本<select name="occurrenceVersionId"></select></label>
+      <label>描述<textarea name="description" required></textarea></label>
+      <div class="dialog-actions"><button type="button" class="button secondary close-dialog">取消</button><button class="button">保存修改</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="fix-dialog">
+    <form id="fix-form">
+      <div class="dialog-head"><div><p class="eyebrow">ADD RESOLUTION</p><h2 id="fix-title">登记修复版本</h2></div><button type="button" class="icon close-dialog">×</button></div>
+      <input type="hidden" name="issueId">
+      <label>修复 / 实现版本<select name="versionId" required></select></label>
+      <label>备注<input name="note" placeholder="可选：合并说明、提交记录等"></label>
+      <div class="dialog-actions"><button type="button" class="button secondary close-dialog">取消</button><button class="button">保存修复记录</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast"></div>
+  <script type="module" src="/v2.js"></script>
+</body>
+</html>

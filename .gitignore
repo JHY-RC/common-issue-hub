@@ -1,0 +1,24 @@
+# Local application data and backups
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Bundled local runtime (large binary, not source code)
+runtime/
+
+# Obsolete pre-MVC server kept locally only for reference
+server.mjs
+
+# Local agent and editor metadata
+.agents/
+.codex/
+.vscode/
+
+# Dependencies and logs
+node_modules/
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
